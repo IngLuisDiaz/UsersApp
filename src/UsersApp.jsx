@@ -12,6 +12,13 @@ export const UsersApp = () => {
     },
   ]);
 
+  const addUser = (newUser) => {
+    setUsers((prevUsers) => [
+      ...prevUsers,
+      { ...newUser, id: prevUsers.length + 1 },
+    ]);
+  };
+
   // Función para manejar la actualización de un usuario
   const handleUpdateUser = (userId) => {
     const updatedUsers = users.map((user) =>
@@ -36,7 +43,8 @@ export const UsersApp = () => {
       <div className="row">
         <div className="col">
             <p>Frmulario</p>
-            <UserForm />
+            <UserForm onAddUser={addUser} 
+            />
         </div>
         <div className="col">
         <UsersList

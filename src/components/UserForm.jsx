@@ -1,11 +1,12 @@
 import { useState } from "react"
+import PropTypes from "prop-types";
 const initialUserForm={
     username:'',
     password:'',
     email:'',
 }
 
-export const UserForm = () =>{
+export const UserForm = ({onAddUser}) =>{
 
     const [userForm, setUserFrom]=useState(initialUserForm);
     const {username, password, email}= userForm;
@@ -23,9 +24,8 @@ export const UserForm = () =>{
             alert('Todos los campos son obligatorios');
             return;
         }
-        // se envian los datos y se limpia formulario
-        setUserFrom (initialUserForm);
-        console.log('Form submitted', userForm)
+       
+        onAddUser(userForm);
         // se envian ls datos y se limpia formulario
         setUserFrom (initialUserForm);
     }
@@ -61,3 +61,6 @@ export const UserForm = () =>{
     
     </>)
 }
+UserForm.propTypes = {
+    onAddUser: PropTypes.func.isRequired,
+  };
