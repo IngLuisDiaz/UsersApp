@@ -1,40 +1,45 @@
+import { useReducer, useState } from "react";
 import { UserForm } from "./components/UserForm";
 import { UsersList } from "./components/UsersList";
-import { useState } from "react";
+import { usersReducer } from "./reducers/usersReducers";
 
 export const UsersApp = () => {
-  const [users, setUsers] = useState([
+  const initialUsers = [
     {
       id: 1,
       username: "Luis Diaz",
       password: "12345",
       email: "luis@example.com",
     },
-  ]);
+  ];
 
-  const addUser = (newUser) => {
-    setUsers((prevUsers) => [
-      ...prevUsers,
-      { ...newUser, id: prevUsers.length + 1 },
-    ]);
+  // useReducer para manejar el estado de los usuarios
+  const [users, dispatch] = useReducer(usersReducer, initialUsers);
+  const [editingUser, setEditingUser] = useState(null);
+
+  // Función para manejar la edición de un usuario
+  const handleEditUser = (user) => {
+    setEditingUser(user); // Cargar el usuario seleccionado en el formulario
   };
 
-  // Función para manejar la actualización de un usuario
-  const handleUpdateUser = (userId) => {
-    const updatedUsers = users.map((user) =>
-      user.id === userId
-        ? { ...user, username: `${user.username} (updated)` } // Lógica de actualización (aquí como ejemplo)
-        : user
-    );
-    setUsers(updatedUsers);
-    console.log(`Usuario con ID ${userId} actualizado`);
+  // Función para agregar o actualizar usuarios
+  const handleSaveUser = (user) => {
+    if (editingUser) {
+      // Si estamos editando, actualizamos
+      dispatch({ type: "UPDATE_USER", payload: user });
+      setEditingUser(null); // Limpiar el estado de edición
+    } else {
+      // Si no estamos editando, agregamos
+      dispatch({ type: "ADD_USER", payload: { ...user, id: users.length + 1 } });
+    }
   };
 
-  // Función para manejar la eliminación de un usuario
+  // Función para eliminar un usuario
   const handleRemoveUser = (userId) => {
-    const filteredUsers = users.filter((user) => user.id !== userId);
-    setUsers(filteredUsers);
-    console.log(`Usuario con ID ${userId} eliminado`);
+    dispatch({ type: "REMOVE_USER", payload: userId });
+  };
+  const handleUpdateUser = (user) => {
+    dispatch({ type: "UPDATE_USER", payload: user });
   };
 
   return (
@@ -42,16 +47,19 @@ export const UsersApp = () => {
       <h2>Users App</h2>
       <div className="row">
         <div className="col">
-            <p>Frmulario</p>
-            <UserForm onAddUser={addUser} 
-            />
+          <p>Formulario</p>
+          <UserForm
+            onSaveUser={handleSaveUser} // Manejar agregar o actualizar
+            editingUser={editingUser} // Usuario que se está editando
+          />
         </div>
         <div className="col">
-        <UsersList
-          users={users}
-          onUpdateUser={handleUpdateUser}
-          onRemoveUser={handleRemoveUser}
-        />
+          <UsersList
+            users={users}
+            onRemoveUser={handleRemoveUser} // Eliminar usuario
+            onEditUser={handleEditUser} // Cargar usuario en el formulario para editar
+            onUpdateUser={handleUpdateUser} //
+          />
         </div>
       </div>
     </div>
