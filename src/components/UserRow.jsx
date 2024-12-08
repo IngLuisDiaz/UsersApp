@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-export const UserRow = ({ index, username, email, onUpdateUser, onRemoveUser }) => {
+export const UserRow = ({ id, index, username, email, onRemoveUser, onEditUser }) => {
   return (
     <tr>
       <td>{index + 1}</td>
@@ -10,17 +10,17 @@ export const UserRow = ({ index, username, email, onUpdateUser, onRemoveUser }) 
         <button
           type="button"
           className="btn btn-secondary btn-sm"
-          onClick={() => onUpdateUser(index)} // Llamar a la función de actualización
+          onClick={onEditUser} // Llamar a la función de actualización
         >
-          Update
+          Actualizar
         </button>
       </td>
       <td>
         <button
           className="btn btn-danger btn-sm"
-          onClick={() => onRemoveUser(index)} // Llamar a la función de eliminación
+          onClick={() => onRemoveUser(id)} // Llamar a la función de eliminación
         >
-          Remove
+          Eliminar
         </button>
       </td>
     </tr>
@@ -28,9 +28,11 @@ export const UserRow = ({ index, username, email, onUpdateUser, onRemoveUser }) 
 };
 
 UserRow.propTypes = {
+  id: PropTypes.number.isRequired, // El id del usuario
   index: PropTypes.number.isRequired,
   username: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
   onUpdateUser: PropTypes.func.isRequired,
   onRemoveUser: PropTypes.func.isRequired,
+  onEditUser: PropTypes.func.isRequired, // Función para abrir el modal de edición
 };

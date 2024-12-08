@@ -1,8 +1,12 @@
 import PropTypes from "prop-types";
 import { UserRow } from "./UserRow";
 
-export const UsersList = ({ users = [], onUpdateUser, onRemoveUser }) => {
+export const UsersList = ({ users = [], onUpdateUser, onRemoveUser, onEditUser }) => {
   return (
+
+    <div>
+        {users.length === 0? (<p className="text-center text-muted"> No hay usuros existentes</p>
+        ):(
     <table className="table table-hover table-striped">
       <thead>
         <tr>
@@ -18,14 +22,16 @@ export const UsersList = ({ users = [], onUpdateUser, onRemoveUser }) => {
           <UserRow
             key={user.id} // Usar el ID como clave única
             index={index}
-            username={user.username}
-            email={user.email}
+            {...user}
             onUpdateUser={onUpdateUser} // Pasar la función de actualización
             onRemoveUser={onRemoveUser} // Pasar la función de eliminación
+            onEditUser={onEditUser} //pasar elusuario para editar
           />
         ))}
       </tbody>
     </table>
+    )}
+    </div>
   );
 };
 
@@ -39,4 +45,5 @@ UsersList.propTypes = {
   ).isRequired,
   onUpdateUser: PropTypes.func.isRequired,
   onRemoveUser: PropTypes.func.isRequired,
+  onEditUser: PropTypes.func.isRequired,
 };
