@@ -38,8 +38,10 @@ export const UsersApp = () => {
   const handleRemoveUser = (userId) => {
     dispatch({ type: "REMOVE_USER", payload: userId });
   };
-  const handleUpdateUser = (user) => {
-    dispatch({ type: "UPDATE_USER", payload: user });
+
+  // Función para manejar la actualización directa de un usuario en la lista
+  const handleUpdateUser = (updatedUser) => {
+    dispatch({ type: "UPDATE_USER", payload: updatedUser });
   };
 
   return (
@@ -47,7 +49,6 @@ export const UsersApp = () => {
       <h2>Users App</h2>
       <div className="row">
         <div className="col">
-          <p>Formulario</p>
           <UserForm
             onSaveUser={handleSaveUser} // Manejar agregar o actualizar
             editingUser={editingUser} // Usuario que se está editando
@@ -55,10 +56,10 @@ export const UsersApp = () => {
         </div>
         <div className="col">
           <UsersList
-            users={users}
+            users={users} // Lista de usuarios actualizada
             onRemoveUser={handleRemoveUser} // Eliminar usuario
+            onUpdateUser={handleUpdateUser} // Actualizar usuario directamente en la lista
             onEditUser={handleEditUser} // Cargar usuario en el formulario para editar
-            onUpdateUser={handleUpdateUser} //
           />
         </div>
       </div>

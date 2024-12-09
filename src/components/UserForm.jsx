@@ -1,95 +1,119 @@
-import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
 export const UserForm = ({ onSaveUser, editingUser }) => {
-  const initialUserForm = editingUser || { username: "", password: "", email: "" };
+  const [formState, setFormState] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
 
-  const [userForm, setUserForm] = useState(initialUserForm);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
 
-  // Actualizar el formulario cuando cambie el usuario en edición
+  // Sincronizar el estado cuando se edita un usuario
   useEffect(() => {
-    setUserForm(editingUser || { username: "", password: "", email: "" });
+    if (editingUser) {
+      setFormState({
+        username: editingUser.username || "",
+        email: editingUser.email || "",
+        password: editingUser.password || "",
+      });
+    } else {
+      setFormState({
+        username: "",
+        email: "",
+        password: "",
+      });
+    }
   }, [editingUser]);
 
-  const onInputChange = ({ target }) => {
-    const { name, value } = target;
-    setUserForm({ ...userForm, [name]: value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
-  const isValidPassword = (password) => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-    return passwordRegex.test(password);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSaveUser({ ...editingUser, ...formState }); // Pasar datos actualizados
+    setFormState({
+      username: "",
+      email: "",
+      password: "",
+    });
   };
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const onSubmit = (event) => {
-    event.preventDefault();
-
-    if (!userForm.username || !userForm.password || !userForm.email) {
-      alert("Todos los campos son obligatorios");
-      return;
-    }
-
-    if (!isValidEmail(userForm.email)) {
-      alert("Por favor, ingresa un correo válido.");
-      return;
-    }
-
-    if (!isValidPassword(userForm.password)) {
-      alert("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
-      return;
-    }
-
-    onSaveUser(userForm); // Llama a la función pasada como prop
-    setUserForm({ username: "", password: "", email: "" }); // Limpia el formulario
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev); // Alternar el estado de mostrar/ocultar contraseña
   };
 
   return (
-    <form onSubmit={onSubmit}>
-      <input
-        className="form-control my-3 w-75"
-        placeholder="Username"
-        name="username"
-        value={userForm.username}
-        onChange={onInputChange}
-      />
-      <input
-        className="form-control my-3 w-75"
-        placeholder="Password"
-        name="password"
-        type={showPassword ? "text" : "password"}
-        value={userForm.password}
-        onChange={onInputChange}
-      />
-      <div>
+    <form onSubmit={handleSubmit}>
+      <div className="mb-3">
+        <label htmlFor="username" className="form-label">
+          Nombre de Usuario
+        </label>
         <input
-          type="checkbox"
-          id="showPassword"
-          onChange={() => setShowPassword((prev) => !prev)}
+          type="text"
+          className="form-control"
+          id="username"
+          name="username"
+          value={formState.username}
+          onChange={handleChange}
+          required
         />
-        <label htmlFor="showPassword"> Mostrar contraseña </label>
       </div>
-      <input
-        className="form-control my-3 w-75"
-        placeholder="Email"
-        name="email"
-        value={userForm.email}
-        onChange={onInputChange}
-      />
-      <button className="btn btn-primary" type="submit">
-        {editingUser ? "Actualizar Usuario" : "Crear Usuario"}
+      <div className="mb-3">
+        <label htmlFor="password" className="form-label">
+          Contraseña
+        </label>
+        <input
+          type={showPassword ? "text" : "password"} // Mostrar como texto o contraseña
+          className="form-control"
+          id="password"
+          name="password"
+          value={formState.password}
+          onChange={handleChange}
+          required
+        />
+        <button
+          type="button"
+          className="btn btn-link"
+          onClick={toggleShowPassword}
+          style={{ padding: 0, marginTop: "5px" }}
+        >
+          {showPassword ? "Ocultar Contraseña" : "Mostrar Contraseña"}
+        </button>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="email" className="form-label">
+          Email
+        </label>
+        <input
+          type="email"
+          className="form-control"
+          id="email"
+          name="email"
+          value={formState.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <button type="submit" className="btn btn-primary">
+        {editingUser ? "Actualizar Usuario" : "Agregar Usuario"}
       </button>
     </form>
   );
 };
 
-// Validación de PropTypes
 UserForm.propTypes = {
   onSaveUser: PropTypes.func.isRequired,
-  editingUser: PropTypes.object,
+  editingUser: PropTypes.shape({
+    id: PropTypes.number,
+    username: PropTypes.string,
+    email: PropTypes.string,
+    password: PropTypes.string,
+  }),
 };
